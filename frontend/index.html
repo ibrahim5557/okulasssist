@@ -1,0 +1,346 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="manifest" href="/manifest.json">
+<meta name="theme-color" content="#4f46e5">
+<title>OkulAsist</title>
+<style>
+  :root{--bg:#f3f4fb;--card:#fff;--ink:#1e1b3a;--mut:#6b7280;--pri:#4f46e5;--pri2:#7c3aed;--line:#e5e7eb;
+    --hi:#ef4444;--mid:#f59e0b;--lo:#10b981}
+  @media(prefers-color-scheme:dark){:root{--bg:#0f1020;--card:#1a1b32;--ink:#eceafc;--mut:#9ca3af;--line:#2b2c4a}}
+  *{box-sizing:border-box}
+  body{font-family:system-ui,-apple-system,sans-serif;margin:0;background:var(--bg);color:var(--ink)}
+  header{background:linear-gradient(135deg,var(--pri),var(--pri2));color:#fff;padding:22px 16px 28px;border-radius:0 0 24px 24px}
+  header h1{margin:0;font-size:22px} header p{margin:4px 0 0;opacity:.85;font-size:13px}
+  main{max-width:640px;margin:-14px auto 90px;padding:0 12px}
+  h2{font-size:15px;margin:22px 4px 8px;display:flex;justify-content:space-between;align-items:center}
+  .card{background:var(--card);border-radius:16px;padding:14px;margin-bottom:10px;box-shadow:0 2px 8px #0000000d;border:1px solid var(--line)}
+  .row{display:flex;gap:10px;align-items:center}
+  .time{background:var(--pri);color:#fff;border-radius:10px;padding:6px 9px;font-weight:700;font-size:13px}
+  .tag{font-size:11px;background:#e0e7ff;color:#3730a3;border-radius:6px;padding:2px 7px;margin-right:6px;font-weight:600}
+  .tag.new{background:#fee2e2;color:#b91c1c}
+  small,.mut{color:var(--mut);font-size:12px}
+  button{background:var(--pri);color:#fff;border:0;border-radius:10px;padding:10px 14px;font-size:14px;font-weight:600;cursor:pointer}
+  button.alt{background:transparent;color:var(--pri);border:1.5px solid var(--pri)}
+  button.sm{padding:6px 10px;font-size:12px;margin-top:8px} button:disabled{opacity:.5}
+  input[type=text]{padding:10px;border:1px solid var(--line);border-radius:10px;width:100%;margin-bottom:8px;background:var(--card);color:var(--ink)}
+  .tabs{display:flex;gap:6px;overflow-x:auto;margin-bottom:12px}
+  .tab{flex:none;background:var(--card);color:var(--ink);border:1px solid var(--line);font-size:13px}
+  .tab.on{background:var(--pri);color:#fff;border-color:var(--pri)}
+  .sum-head{padding:4px 2px 10px}.sum-head b{font-size:17px}
+  .bar{height:6px;background:var(--line);border-radius:6px;margin:8px 0 12px;overflow:hidden}
+  .bar i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--pri),var(--pri2));transition:width .3s}
+  .kart{border-left:5px solid var(--mid);cursor:pointer;transition:opacity .2s}
+  .kart.yuksek{border-left-color:var(--hi)}.kart.orta{border-left-color:var(--mid)}.kart.dusuk{border-left-color:var(--lo)}
+  .kart.done{opacity:.55}
+  .kart h3{margin:0 0 6px;font-size:15px;display:flex;justify-content:space-between;gap:8px}
+  .kart p{margin:0;line-height:1.55;font-size:14px}
+  .chip{font-size:11px;background:var(--bg);border:1px solid var(--line);border-radius:20px;padding:2px 8px;color:var(--mut);white-space:nowrap;align-self:flex-start}
+  .ornek{margin-top:8px;padding:8px 10px;background:var(--bg);border-radius:10px;font-size:13px;color:var(--mut)}
+  .skel{height:78px;border-radius:16px;margin-bottom:10px;background:linear-gradient(90deg,var(--line),var(--card),var(--line));background-size:200%;animation:sh 1.2s infinite}
+  @keyframes sh{to{background-position:-200%}}
+  .err{border-left:5px solid var(--hi)}
+  button.sil{background:#fff;color:#ad3446;border:1px solid #efcbd0;margin-top:12px}
+  .q b{display:block;margin-bottom:8px}
+  .opt{display:block;width:100%;text-align:left;background:var(--bg);color:var(--ink);margin-top:6px;border:1px solid var(--line)}
+  .opt.ok{background:#bbf7d0;color:#14532d}.opt.bad{background:#fecaca;color:#7f1d1d}
+  #toast{position:fixed;left:12px;right:12px;bottom:16px;max-width:616px;margin:auto;background:#111827;color:#fff;
+    border-radius:16px;padding:14px;display:none;box-shadow:0 8px 30px #0006;z-index:9}
+  #toast button{background:#fff;color:#111827}
+
+  /* Kart odaklı, mobil uyumlu dashboard */
+  :root{--bg:#f5f6fb;--card:#fff;--ink:#1d2340;--mut:#77809a;--pri:#6255db;--pri2:#8a70ed;--line:#e9ebf3}
+  body{background:var(--bg);font-family:Inter,system-ui,-apple-system,sans-serif}
+  header{padding:34px max(22px,calc((100vw - 1050px)/2)) 60px;border-radius:0 0 32px 32px;background:linear-gradient(120deg,#3731a0,#6f5ce0 70%,#a58cf4)}
+  header h1{font-size:28px;letter-spacing:-.8px} header p{font-size:14px;margin-top:8px}
+  main{max-width:1050px;margin:-30px auto 80px;padding:0 20px;display:grid;grid-template-columns:1fr 1fr;gap:0 20px}
+  main>h2,main>div{min-width:0} main>h2{grid-column:1/-1;margin:28px 3px 12px;font-size:17px;letter-spacing:-.3px}
+  #dersler,#yarin,#duyurular,#odevler{grid-column:1/-1;display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px}
+  #notAlan{grid-column:1/-1} #notAlan #icerik{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px}
+  #notAlan .tabs{margin:0 0 15px} .sum-head{grid-column:1/-1}
+  main> .card{grid-column:1/-1} .card{margin:0;padding:20px;border-radius:18px;box-shadow:0 8px 26px #3d3c6810}
+  .row{gap:14px}.time{padding:12px;border-radius:13px;background:#eeedff;color:#5144c7}
+  .tag{display:inline-block;margin-bottom:10px;padding:5px 9px;border-radius:8px} small,.mut{font-size:13px;line-height:1.5}
+  button{transition:transform .15s,box-shadow .15s} button:hover:not(:disabled){transform:translateY(-2px);box-shadow:0 5px 15px #6255db33}
+  select{padding:11px;border:1px solid var(--line);border-radius:10px;width:100%;margin-bottom:8px;background:var(--card);color:var(--ink)}
+  button:focus-visible{outline:3px solid #fbbf24;outline-offset:2px} .kart{border-left-width:4px;min-height:150px}
+  .kart h3{line-height:1.4} .kart p{line-height:1.65} .skel{margin:0} .err{grid-column:1/-1}
+  @media(max-width:600px){header{padding:28px 20px 55px} main{padding:0 14px} #dersler,#yarin,#duyurular,#odevler,#notAlan #icerik{grid-template-columns:1fr} .tabs{padding-bottom:4px}}
+
+  /* OkulAsist dashboard */
+  :root{--bg:#f5f6fa;--card:#fff;--ink:#1b2033;--mut:#778096;--pri:#5547d6;--line:#e9ebf1}
+  body{background:var(--bg);font-family:Inter,system-ui,-apple-system,sans-serif;letter-spacing:-.01em}
+  header{background:#171a33;color:#fff;border-radius:0;padding:0 28px}
+  .topbar{max-width:1200px;margin:auto;min-height:78px;display:flex;align-items:center;justify-content:space-between;gap:16px}
+  .brand{display:flex;align-items:center;gap:11px}.brand-mark{display:grid;place-items:center;width:38px;height:38px;background:#8175ff;border-radius:12px;font-size:20px}.brand strong{font-size:19px;letter-spacing:-.04em}.top-pill{border:1px solid #ffffff25;border-radius:50px;padding:8px 13px;font-size:12px;color:#dedff3}
+  main{display:block;max-width:1200px;margin:0 auto 70px;padding:34px 28px}
+  .hero{position:relative;overflow:hidden;background:linear-gradient(115deg,#5143cb,#7669e7 70%,#9c8cf0);color:white;border-radius:23px;padding:32px 36px;margin-bottom:32px;min-height:180px;display:flex;flex-direction:column;justify-content:center}
+  .hero:after{content:'';position:absolute;right:-25px;top:-130px;width:320px;height:320px;border:55px solid #ffffff12;border-radius:50%;pointer-events:none}
+  .eyebrow{font-size:11px;letter-spacing:.15em;font-weight:750;text-transform:uppercase;opacity:.8}.hero h1{font-size:30px;letter-spacing:-.04em;margin:10px 0 7px}.hero p{margin:0;color:#f2efff;font-size:14px;line-height:1.6;max-width:490px}
+  h2{font-size:18px;margin:34px 0 14px;gap:12px;letter-spacing:-.025em} h2 small{font-weight:500;text-align:right}.section-note{font-size:12px;color:var(--mut);margin:-7px 0 15px}
+  #dersler,#yarin,#duyurular,#odevler{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:14px}
+  .card{background:white;border:1px solid var(--line);box-shadow:0 8px 22px #292f5208;border-radius:17px;padding:19px;line-height:1.55;min-width:0;transition:box-shadow .2s,transform .2s}.card:hover{box-shadow:0 12px 28px #292f5210}
+  .time{background:#f0edff;color:#5a4dd4;font-size:12px;padding:10px;border-radius:11px}.row b{font-size:14px}.row small{display:block;margin-top:4px}
+  .tag{background:#f0edff;color:#6556d5;font-size:10px;letter-spacing:.02em;padding:5px 9px;border-radius:7px;margin-bottom:12px}.tag.new{background:#def8eb;color:#167548}
+  .notice-card{display:flex;flex-direction:column;min-height:170px}.notice-top{display:flex;align-items:flex-start;justify-content:space-between;gap:8px}.notice-course{font-size:12px;color:#757d90;font-weight:650;margin-top:3px}.notice-title{font-size:15px;font-weight:700;margin:9px 0 5px;overflow-wrap:anywhere}.notice-footer{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-top:auto;padding-top:14px}.notice-footer small{font-size:12px}.notice-body{font-size:13px;color:#69718a;line-height:1.55;margin-top:8px}
+  button{font-family:inherit;background:var(--pri);border-radius:10px}button:focus-visible,a:focus-visible{outline:3px solid #c1b8ff;outline-offset:3px}button.sm{margin:0;padding:8px 11px;font-size:12px}.delete-icon{display:grid;place-items:center;width:34px;height:34px;margin:0!important;border:1px solid transparent;border-radius:9px;background:transparent;color:#9aa0af;padding:0;cursor:pointer}.delete-icon:hover{color:#c43b50;background:#fff1f2;border-color:#ffdce0;transform:none!important;box-shadow:none!important}.delete-icon svg{width:17px;height:17px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+  .empty{color:var(--mut)} #notAlan #icerik{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px}.sum-head,.err{grid-column:1/-1}.tabs{padding-bottom:6px}.tab{border-radius:11px}.kart{border-left-width:4px}.skel{margin:0}
+  dialog{border:0;border-radius:22px;padding:0;max-width:430px;width:calc(100% - 32px);box-shadow:0 24px 90px #11153340;color:var(--ink)}dialog::backdrop{background:#171a33a8} .dialog-inner{padding:28px}.dialog-icon{width:46px;height:46px;display:grid;place-items:center;border-radius:14px;background:#fff0f1;color:#c54053;font-size:22px}.dialog-inner h3{margin:18px 0 8px;font-size:21px;letter-spacing:-.03em}.dialog-inner p{color:#6b7388;font-size:14px;line-height:1.6;margin:0}.dialog-actions{display:flex;gap:10px;justify-content:flex-end;margin-top:24px}.dialog-actions button{padding:10px 17px}.cancel-btn{background:#f1f2f6;color:#4d566a}.danger-btn{background:#d7475a}.dialog-error{margin-top:12px;color:#b42337;font-size:13px}
+  #toast{border-radius:15px;background:#171a33;max-width:500px;right:24px;left:auto;bottom:24px}.toast-title{display:block;margin-bottom:3px}
+  @media(max-width:600px){header{padding:0 18px}.topbar{min-height:68px}.top-pill{font-size:10px}main{padding:22px 16px}.hero{padding:27px 23px;min-height:165px}.hero h1{font-size:25px}.hero:after{width:230px;height:230px;right:-100px}h2{font-size:16px;margin-top:28px}h2 small{font-size:11px}#dersler,#yarin,#duyurular,#odevler,#notAlan #icerik{grid-template-columns:1fr}.dialog-actions button{flex:1}#toast{left:16px;right:16px;bottom:16px}}
+
+
+  .navlinks{display:flex;gap:14px;align-items:center}.navlinks a{color:#dadcf0;text-decoration:none;font-size:12px;font-weight:600}.navlinks a:hover{color:#fff}.bell{position:relative;background:#ffffff14;color:white;padding:9px 12px;border:1px solid #ffffff24;border-radius:11px}.badge{display:inline-block;background:#f2627b;color:white;border-radius:20px;min-width:19px;padding:2px 5px;font-size:10px;text-align:center}
+  .hero-stats{display:flex;gap:10px;margin-top:20px;flex-wrap:wrap}.stat{background:#ffffff1b;border:1px solid #ffffff20;border-radius:12px;padding:9px 14px;font-size:12px}.stat b{font-size:16px;margin-right:5px}.date-label{font-size:12px;opacity:.85;margin-top:7px}
+  .prep-grid,.courses-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px}.prep-card{background:#eeeaff;border:1px solid #ded8ff}.prep-card h3,.course-card h3{font-size:16px;margin:7px 0}.prep-card p,.course-card p{font-size:13px;color:#70778b;margin:6px 0 15px}.course-card{cursor:pointer;text-align:left;color:var(--ink);width:100%;font-weight:400}.course-card:hover{transform:translateY(-2px)}.course-code{font-size:11px;color:#6455d4;font-weight:750}.action-link{color:#5c4ed1;font-size:12px;font-weight:700}.task-actions{margin-top:12px}.task-done{opacity:.7}.quiet-btn{border:1px solid #ddd9fa;background:#f5f3ff;color:#5547c6}.progress-label{font-size:12px;color:#737b8f}.q-result{grid-column:1/-1;background:#eeeaff}.q-result h3{margin:0 0 6px}.q-result button{margin:8px 8px 0 0}.kart{cursor:default}.card-check{margin-top:12px;background:#f0edff;color:#584acb;border:1px solid #dfd9ff}.kart.done{opacity:1;background:#f6fcf8}.kart.done .card-check{background:#e0f6e8;color:#247345}.notify-list{max-height:50vh;overflow:auto}.notify-row{padding:12px 0;border-bottom:1px solid #e9ebf3}.notify-row button{margin-top:7px}.dialog-inner .mut{display:block}
+  @media(max-width:720px){.navlinks a{display:none}.navlinks{gap:6px}.hero-stats{gap:6px}.stat{padding:8px}.courses-grid,.prep-grid{grid-template-columns:1fr}}
+
+
+.grade-card h3{font-size:15px;margin:6px 0 10px}.grade-row{display:flex;justify-content:space-between;gap:10px;font-size:13px;padding:7px 0;border-top:1px solid var(--line)}.grade-row span{color:#69718a}.grade-val{font-weight:750;white-space:nowrap}.grade-val.bos{color:#b0b6c5;font-weight:500}.grade-val.yeni{background:#def8eb;color:#167548;border-radius:7px;padding:0 7px}.grade-recent{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:14px;margin-bottom:14px}.grade-recent .card{background:#f0fbf5;border-color:#cdeedb}.grade-big{font-size:26px;font-weight:800;letter-spacing:-.03em;color:#167548}
+.gmail-bar{display:flex;align-items:center;gap:14px;padding:16px 20px}.gmail-dot{width:11px;height:11px;border-radius:50%;background:#c3c7d3;flex:none}.gmail-dot.on{background:#22a35a;box-shadow:0 0 0 5px #22a35a22}.gmail-info{flex:1;min-width:0}.gmail-info b{display:block;font-size:14px}.gmail-info small{font-size:12px}
+.mail-panel{background:white;border:1px solid var(--line);border-radius:17px;padding:20px;margin-bottom:14px}.mail-controls{display:flex;gap:10px;align-items:end;flex-wrap:wrap}.mail-controls label{font-size:12px;color:var(--mut);flex:1;min-width:200px}.mail-controls input{display:block;width:100%;padding:11px;border:1px solid var(--line);border-radius:10px;font:inherit;margin-top:5px}.mail-status{font-size:12px;color:var(--mut);margin:12px 0 0}.mail-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:14px}.mail-link{color:#5547d6;font-size:12px;font-weight:700;text-decoration:none}.mail-subject{overflow-wrap:anywhere}.mail-snippet{font-size:13px;line-height:1.5;color:#69718a}.mail-grid .card{min-width:0}
+</style>
+</head>
+<body>
+<header><div class="topbar"><div class="brand"><span class="brand-mark">✦</span><strong>OkulAsist</strong></div><nav class="navlinks" aria-label="Ana menü"><a href="#derslerim">Derslerim</a><a href="#sabisBaslik">Notlarım</a><a href="#duyurularBaslik">Duyurular</a><a href="#notBaslik">Çalışma alanı</a><button class="bell" onclick="bildirimleriAc()" aria-label="Bildirimleri göster">Bildirimler <span class="badge" id="badge">0</span></button></nav></div></header>
+<main>
+  <section class="hero"><span class="eyebrow">KAMPÜS ASİSTANIN</span><h1>Bugün neye odaklanıyoruz?</h1><p>Derslerini, duyurularını ve çalışma notlarını tek bir yerden takip et.</p><div class="date-label" id="bugunTarih"></div><div class="hero-stats"><span class="stat"><b id="statDers">0</b> bugün ders</span><span class="stat"><b id="statYeni">0</b> okunmamış not</span><span class="stat"><b id="statOdev">0</b> bekleyen ödev</span></div></section>
+  <h2>Bugünkü dersler <button class="alt sm" id="bildirimBtn" onclick="izinIste()" style="margin:0;background:var(--card)">🔔 Bildirimleri aç</button></h2>
+  <div id="dersler"></div>
+
+  <h2>Yarın için hazırlan <small>Son yüklenen ders notuna göre</small></h2><div id="hazirlikKartlari" class="prep-grid"></div>
+  <h2>Yarınki dersler <small>Haftalık programa göre</small></h2><div id="yarin"></div>
+  <h2 id="derslerim">Derslerim <small>Bir ders seçerek notlarını gör</small></h2><div id="dersKartlari" class="courses-grid"></div>
+  <h2 id="sabisBaslik"><span>SABİS notlarım <button class="sm quiet-btn" id="sabisOkunduBtn" onclick="sabisOkundu()" hidden>Yeni notları okundu işaretle</button></span><small id="sabisSenkron">OkulAsist SABİS eklentisinden gelir</small></h2><div id="sabisYeni" class="grade-recent"></div><div id="sabisNotlar" class="courses-grid"></div>
+  <h2 id="duyurularBaslik"><span>Duyurular <button class="sm quiet-btn" id="duyuruOkunduBtn" onclick="sabisOkundu()" hidden>Yenileri okundu işaretle</button></span><small>Güncel akışın</small></h2><p class="section-note" id="duyuruNot">Paylaşılan SABİS duyuruları örnek kayıtlardır.</p><div id="duyurular"></div>
+  <h2 id="gmailBaslik">Okul maili <small>@sakarya.edu.tr adresinden gelenler</small></h2>
+  <div class="mail-panel gmail-bar"><span class="gmail-dot" id="gmailNokta"></span><div class="gmail-info"><b id="gmailBaslikDurum">Gmail</b><small id="gmailDurum">Bağlantı kontrol ediliyor…</small></div><input id="gmailQuery" type="hidden" value="from:(sakarya.edu.tr)"><button class="sm quiet-btn" id="gmailYenile" onclick="gmailYenile()">↻ Yenile</button></div><div id="gmailKartlar" class="mail-grid"></div>
+  <h2>Ödevler</h2><div id="odevler"></div>
+
+  <h2 id="notBaslik">Ders notu</h2>
+  <div id="notAlan"><div class="card mut">Bir duyurudaki "Notu aç" butonuna dokun.</div></div>
+
+
+</main>
+<div id="toast" role="status"></div>
+<dialog id="dersDialog" aria-labelledby="dersDialogTitle"><div class="dialog-inner"><h3 id="dersDialogTitle"></h3><div id="dersDialogBody"></div><div class="dialog-actions"><button class="cancel-btn" onclick="$('dersDialog').close()">Kapat</button></div></div></dialog>
+<dialog id="bildirimDialog" aria-labelledby="bildirimTitle"><div class="dialog-inner"><h3 id="bildirimTitle">Bildirimler</h3><p>Yüklenen ders notları</p><div id="bildirimList" class="notify-list"></div><div class="dialog-actions"><button class="cancel-btn" onclick="$('bildirimDialog').close()">Kapat</button><button class="quiet-btn" onclick="tumunuOku()">Tümünü okundu işaretle</button></div></div></dialog>
+<dialog id="silDialog" aria-labelledby="silBaslik" aria-describedby="silAciklama"><div class="dialog-inner"><div class="dialog-icon" aria-hidden="true">⌫</div><h3 id="silBaslik">Duyuruyu kaldıralım mı?</h3><p id="silAciklama">Bu duyuru ana ekranından kaldırılacak. SABİS’teki orijinal duyuru etkilenmez.</p><div id="silHata" class="dialog-error" role="alert"></div><div class="dialog-actions"><button class="cancel-btn" type="button" onclick="document.getElementById('silDialog').close()">Vazgeç</button><button class="danger-btn" id="silOnay" type="button">Duyuruyu kaldır</button></div></div></dialog>
+<script>
+const $ = id => document.getElementById(id);
+const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const card = h => `<div class="card">${h}</div>`;
+let notGorulen = new Set(), seen = new Set(), first = true, aktifNot = null, aktifMod = "10", istekNo = 0, feedData = null, quizCevaplar = {}, kartGorunumu = -1;
+const MODLAR = [["hazirlik","🌙 Yarın için"],["10","⚡ 10 dk"],["30","📚 30 dk"],["quiz","🎯 Quiz"]];
+
+if ("serviceWorker" in navigator) navigator.serviceWorker.register("/sw.js");
+
+function izinIste() {
+  if (!("Notification" in window)) return alert("Bu tarayıcı bildirim desteklemiyor.");
+  Notification.requestPermission().then(p => $("bildirimBtn").textContent = p === "granted" ? "🔔 Açık" : "🔕 İzin yok");
+}
+function bildir(ders, nid) {
+  const t = $("toast"); t.style.display = "block";
+  t.innerHTML = `<b>📌 ${esc(ders)}: yeni not yüklendi</b><br><small style="color:#d1d5db">Hazırlık notunu oluşturmak için aç.</small><br>
+    <button class="sm" onclick="notAc('${nid}','hazirlik');$('toast').style.display='none'">Hazırlık notunu aç</button>`;
+  setTimeout(() => t.style.display = "none", 12000);
+  if ("Notification" in window && Notification.permission === "granted")
+    new Notification(ders + ": yeni not yüklendi", { body: "Hazırlık notunu oluşturmak için aç." });
+}
+
+function dersinSonNotu(dersAdi) {
+  const hedef = String(dersAdi).toLocaleLowerCase("tr");
+  return (feedData?.duyurular || []).find(n => n.id && String(n.ders).toLocaleLowerCase("tr") === hedef);
+}
+function notBildir(g) {
+  const t = $("toast"), notu = dersinSonNotu(g.ad);
+  t.style.display = "block";
+  t.innerHTML = `<b class="toast-title">📊 ${esc(g.ad)}: ${esc(g.tip)} notun açıklandı${g.demo ? " (test)" : ""}</b><span style="font-size:22px;font-weight:800">${esc(g.not)}</span><br>
+    <small style="color:#d1d5db">${notu ? "Bu dersin notundan kendini test etmek ister misin?" : "Notlarım bölümünde ayrıntılara bakabilirsin."}</small><br>
+    ${notu ? `<button class="sm" onclick="notAc('${notu.id}','quiz');$('toast').style.display='none'">🎯 Quiz çöz</button> ` : ""}<button class="sm" onclick="$('sabisBaslik').scrollIntoView({behavior:'smooth'});$('toast').style.display='none'">Notlarıma git</button>`;
+  setTimeout(() => t.style.display = "none", 15000);
+  if ("Notification" in window && Notification.permission === "granted")
+    new Notification(`${g.ad}: ${g.tip} notun açıklandı`, { body: `Notun: ${g.not}` });
+}
+function duyuruBildir(x) {
+  const t = $("toast"); t.style.display = "block";
+  t.innerHTML = `<b class="toast-title">📢 ${esc(x.kaynak)} · ${esc(x.ders)}</b>${esc(x.baslik)}<br>
+    <button class="sm" onclick="$('${x.kaynak.includes("Ödev") ? "odevler" : "duyurularBaslik"}').scrollIntoView({behavior:'smooth'});$('toast').style.display='none'">Göster</button>`;
+  setTimeout(() => t.style.display = "none", 15000);
+  if ("Notification" in window && Notification.permission === "granted")
+    new Notification(`${x.kaynak}: ${x.ders}`, { body: x.baslik });
+}
+function sabisCiz(d) {
+  const s = d.sabis || { dersler: [], notlar: [] };
+  $("sabisSenkron").textContent = s.son_senkron
+    ? "Son SABİS kontrolü: " + new Date(s.son_senkron).toLocaleString("tr-TR", { day: "2-digit", month: "2-digit", hour: "2-digit", minute: "2-digit" })
+    : "OkulAsist SABİS eklentisi henüz veri göndermedi";
+  const yeniler = s.notlar.filter(x => !x.okundu);
+  $("sabisYeni").innerHTML = yeniler.length ? yeniler.map(g => {
+    const notu = dersinSonNotu(g.ad);
+    return `<div class="card"><span class="tag new">YENİ NOT${g.demo ? " · TEST" : ""}</span><div class="notice-course">${esc(g.kod)} · ${esc(g.ad)}</div><div class="notice-title">${esc(g.tip)} <small>(%${esc(g.oran)})</small></div><div class="grade-big">${esc(g.not)}</div><div class="notice-footer"><small>${esc(g.zaman)}</small>${notu ? `<button class="sm" onclick="notAc('${notu.id}','quiz')">🎯 Quiz çöz</button>` : ""}</div></div>`;
+  }).join("") : "";
+  $("sabisOkunduBtn").hidden = !yeniler.length;
+  $("sabisNotlar").innerHTML = s.dersler.map(c => `<div class="card grade-card"><span class="course-code">${esc(c.kod)}</span><h3>${esc(c.ad)}</h3>${c.satirlar.map(r =>
+    `<div class="grade-row"><span>${esc(r.tip)} · %${esc(r.oran)}</span><b class="grade-val ${r.not ? (r.yeni ? "yeni" : "") : "bos"}">${r.not ? esc(r.not) : "—"}</b></div>`).join("")}${c.program_index !== null ? `<button class="sm quiet-btn" style="margin-top:12px" onclick="dersAc(${c.program_index})">Ders detayları →</button>` : ""}</div>`).join("")
+    || card('<span class="empty">Henüz SABİS verisi yok. SABİS\'e giriş yapıp eklentide "Şimdi kontrol et"e bas.</span>');
+}
+async function sabisOkundu() { try { const r = await fetch("/api/sabis/okundu", { method: "POST" }); if (!r.ok) throw Error(); await yukle(); } catch (e) { alert("Notlar güncellenemedi."); } }
+
+async function yukle() {
+  try {
+    const response = await fetch("/api/feed"); if (!response.ok) throw new Error("Akış yüklenemedi");
+    const d = await response.json(); feedData = d;
+    const okunmamis = d.duyurular.filter(x => x.id && !x.okundu);
+    const sabisYeniDuyuru = d.duyurular.filter(x => x.sabis_id && x.yeni);
+    $("badge").textContent = okunmamis.length + (d.sabis?.notlar || []).filter(x => !x.okundu).length + sabisYeniDuyuru.length;
+    $("duyuruOkunduBtn").hidden = !sabisYeniDuyuru.length;
+    $("duyuruNot").textContent = d.duyurular.some(x => x.sabis_id) ? "SABİS duyuruları ve ödevleri OkulAsist SABİS eklentisinden gelir." : "Paylaşılan SABİS duyuruları örnek kayıtlardır. Gerçekleri için SABİS eklentisini kullan.";
+    $("statYeni").textContent = okunmamis.length;
+    $("statDers").textContent = d.dersler_bugun.length;
+    $("statOdev").textContent = d.odevler.filter(x => !x.tamamlandi && x.kalan_gun !== null && x.kalan_gun >= 0).length;
+    $("bugunTarih").textContent = d.tarih;
+    sabisCiz(d);
+    $("hazirlikKartlari").innerHTML = d.dersler_yarin.map(x => {
+      const not = d.duyurular.find(n => n.id && n.ders === x.ders);
+      return `<div class="card prep-card"><span class="course-code">YARIN · ${esc(x.saat)}</span><h3>${esc(x.ders)}</h3><p>${esc(x.yer)} · ${not ? "Son yüklenen ders notuna göz at." : "Bu ders için henüz not yüklenmedi."}</p>${not ? `<button class="sm" onclick="notAc('${not.id}','hazirlik')">Hazırlığa başla →</button>` : ""}</div>`;
+    }).join("") || card('<span class="empty">Yarın için kayıtlı ders yok.</span>');
+    $("dersKartlari").innerHTML = d.program.map((x,i) => `<button class="card course-card" onclick="dersAc(${i})"><span class="course-code">${['PAZARTESİ','SALI','ÇARŞAMBA','PERŞEMBE','CUMA','CUMARTESİ','PAZAR'][x.gun]}</span><h3>${esc(x.ders)}</h3><p>${esc(x.saat)} · ${esc(x.yer)}</p><span class="action-link">Ders detayları →</span></button>`).join("");
+    $("dersler").innerHTML = d.dersler_bugun.map(x =>
+      card(`<div class="row"><span class="time">${esc(x.saat)}</span><div><b>${esc(x.ders)}</b><br><small>📍 ${esc(x.yer)}</small></div></div>`)).join("");
+    $("dersler").innerHTML ||= card('<span class="mut">Bugün için kayıtlı ders yok.</span>');
+    $("yarin").innerHTML = d.dersler_yarin.map(x => card(`<div class="row"><span class="time">${esc(x.saat)}</span><div><b>${esc(x.ders)}</b><br><small>${esc(x.yer)}</small></div></div>`)).join("") || card('<span class="mut">Yarın için kayıtlı ders yok.</span>');
+    $("odevler").innerHTML = d.odevler.map(x => card(`<div class="${x.tamamlandi ? 'task-done' : ''}"><span class="tag">${x.tamamlandi ? 'TAMAMLANDI' : x.kalan_gun === null ? 'TARİH YOK' : x.kalan_gun < 0 ? 'TARİHİ GEÇTİ' : x.kalan_gun === 0 ? 'BUGÜN' : x.kalan_gun + ' GÜN KALDI'}</span><br><b>${esc(x.ders)}</b><br>${esc(x.baslik)}<br><small>Son teslim: ${esc(x.son)}</small>${x.link ? ` · <a class="mail-link" href="${esc(x.link)}" target="_blank" rel="noopener noreferrer">SABİS'te aç ↗</a>` : ""}<div class="task-actions"><button class="sm quiet-btn" onclick="odevDurumu('${x.task_id}',${!x.tamamlandi})">${x.tamamlandi ? 'Geri al' : 'Tamamlandı işaretle'}</button></div></div>`)).join("");
+    $("duyurular").innerHTML = d.duyurular.map(x => `<article class="card notice-card"><div class="notice-top"><div><span class="tag">${esc(x.kaynak)}</span>${(x.id && !x.okundu) || x.yeni ? '<span class="tag new">YENİ</span>' : ""}</div>${x.arsiv_id ? `<button class="delete-icon" type="button" aria-label="Duyuruyu kaldır" title="Duyuruyu kaldır" onclick="duyuruSil('${x.arsiv_id}')"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M10 4h4M6 7l1 13h10l1-13M10 11v5M14 11v5"/></svg></button>` : ""}</div><div class="notice-course">${esc(x.ders)}</div><div class="notice-title">${esc(x.baslik)}</div>${x.id ? `<div class="notice-body">${x.analiz === "ready" ? "Konular: " + esc(x.konular.join(", ")) : x.analiz === "pending" ? "Not analiz ediliyor…" : "Hazırlık notu henüz oluşturulamadı; açıp tekrar deneyebilirsin."}</div>` : ""}<div class="notice-footer"><small>${esc(x.zaman)}</small>${x.id ? `<button class="sm" onclick="notAc('${x.id}','hazirlik')">Notu aç →</button>` : x.link ? `<a class="mail-link" href="${esc(x.link)}" target="_blank" rel="noopener noreferrer">SABİS'te aç ↗</a>` : ""}</div></article>`).join("") || card('<span class="empty">Henüz duyuru yok.</span>');
+    d.duyurular.filter(x => x.id && !seen.has(x.id)).forEach(x => { if (!first) bildir(x.ders, x.id); seen.add(x.id); });
+    d.duyurular.filter(x => x.sabis_id && !seen.has(x.sabis_id)).forEach(x => { if (!first && x.yeni) duyuruBildir(x); seen.add(x.sabis_id); });
+    (d.sabis?.notlar || []).filter(x => !notGorulen.has(x.anahtar + "|" + x.not + "|" + x.zaman)).forEach(x => { if (!first && !x.okundu) notBildir(x); notGorulen.add(x.anahtar + "|" + x.not + "|" + x.zaman); });
+    first = false;
+  } catch (e) { console.error(e); }
+}
+yukle(); setInterval(yukle, 5000);
+let gmailBagli = false, gmailIslem = false;
+async function gmailDurumKontrol(){
+  try { const r=await fetch('/api/gmail/status'); if(!r.ok)throw Error(); const d=await r.json(); gmailBagli=d.connected; $('gmailNokta').classList.toggle('on',gmailBagli); $('gmailBaslikDurum').textContent=gmailBagli?'Gmail bağlı':'Gmail bağlı değil'; $('gmailDurum').textContent=gmailBagli?'Okul mailleri kontrol ediliyor…':'Okul maillerini görmek için Gmail bağlantısını kur.'; if(gmailBagli) await gmailYenile(); }
+  catch(e){$('gmailDurum').textContent='Gmail bağlantı durumu kontrol edilemedi.'}
+}
+async function gmailYenile(){
+  if(gmailIslem)return;
+  if(!gmailBagli){$('gmailDurum').textContent='Gmail henüz bağlı değil. Önce kurulum adımlarını tamamla.';return;}
+  gmailIslem=true;$('gmailYenile').disabled=true;$('gmailDurum').textContent='Okul mailleri kontrol ediliyor…';
+  try{
+    const r=await fetch('/api/gmail/sync',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({query:$('gmailQuery').value})});const d=await r.json();if(!r.ok)throw Error(d.detail||'Mailler getirilemedi.');
+    $('gmailKartlar').innerHTML=d.messages.map(m=>`<article class="card"><span class="tag">OKUL MAİLİ</span>${m.okunmamis?'<span class="tag new">YENİ</span>':''}<div class="notice-course">${esc(m.gonderen)}</div><div class="notice-title mail-subject">${esc(m.baslik)}</div><div class="mail-snippet">${esc(m.ozet)}</div><div class="notice-footer"><small>${esc(isNaN(new Date(m.tarih)) ? m.tarih : new Date(m.tarih).toLocaleString('tr-TR',{day:'numeric',month:'long',hour:'2-digit',minute:'2-digit'}))}</small>${String(m.id).startsWith('demo') ? '' : `<a class="mail-link" href="https://mail.google.com/mail/u/0/#all/${esc(m.id)}" target="_blank" rel="noopener noreferrer">Gmail’de aç ↗</a>`}</div></article>`).join('')||card('<span class="empty">Okul adresinden yeni mail yok.</span>');
+    const okunmamisMail=d.messages.filter(m=>m.okunmamis).length;$('gmailDurum').textContent=`Okul mailin otomatik takip ediliyor · ${okunmamisMail ? okunmamisMail+' okunmamış · ' : ''}Son kontrol ${new Date().toLocaleTimeString('tr-TR',{hour:'2-digit',minute:'2-digit'})}`;
+  }catch(e){$('gmailDurum').textContent=e.message||'Gmail okunamadı.'}
+  finally{gmailIslem=false;$('gmailYenile').disabled=false}
+}
+gmailDurumKontrol();setInterval(()=>{if(gmailBagli && document.visibilityState==='visible')gmailYenile()},300000);
+
+let silinecekDuyuru = null;
+function duyuruSil(id) {
+  silinecekDuyuru = id;
+  $("silHata").textContent = "";
+  $("silDialog").showModal();
+}
+$("silOnay").addEventListener("click", async () => {
+  if (!silinecekDuyuru) return;
+  const button = $("silOnay");
+  button.disabled = true;
+  try {
+    const r = await fetch(`/api/announcements/${silinecekDuyuru}`, {method: "DELETE"});
+    if (!r.ok) throw new Error("Duyuru kaldırılamadı. Lütfen tekrar dene.");
+    $("silDialog").close();
+    silinecekDuyuru = null;
+    await yukle();
+  } catch (e) { $("silHata").textContent = e.message || "Sunucuya ulaşılamadı."; }
+  finally { button.disabled = false; }
+});
+
+async function notAc(nid, mod) {
+  if ($("dersDialog").open) $("dersDialog").close(); if ($("bildirimDialog").open) $("bildirimDialog").close();
+  aktifNot = nid; mod_(mod); $("notBaslik").scrollIntoView({ behavior: "smooth" });
+  try { const r=await fetch(`/api/notes/${nid}/read`,{method:"POST"}); if(!r.ok)throw Error(); await yukle(); } catch(e){ console.error("Okundu durumu kaydedilemedi.",e); }
+}
+function mod_(mod) {
+  aktifMod = mod;
+  const tabs = `<div class="tabs">${MODLAR.map(([k, l]) =>
+    `<button class="tab ${k === mod ? "on" : ""}" onclick="mod_('${k}')">${l}</button>`).join("")}</div>`;
+  $("notAlan").innerHTML = tabs + `<div id="icerik"><p class="mut" style="grid-column:1/-1">İçerik hazırlanıyor; yoğunluğa bağlı olarak biraz sürebilir…</p><div class="skel"></div><div class="skel"></div><div class="skel"></div></div>`;
+  getir(mod, aktifNot, ++istekNo);
+}
+async function getir(mod, nid, requestId) {
+  try {
+    const r = await fetch(`/api/notes/${nid}/${mod}`), j = await r.json();
+    if (requestId !== istekNo) return;
+    if (!r.ok) throw new Error(j.detail || "Hata oluştu");
+    if (mod === "quiz") { window._quiz = j.quiz; quizCevaplar = {}; $("icerik").innerHTML = quizHtml(j.quiz); }
+    else {
+      const pr = await fetch(`/api/progress/${nid}/${mod}`); if (!pr.ok) throw new Error("İlerleme alınamadı."); const progress=await pr.json();
+      if(requestId !== istekNo) return;
+      kartGorunumu = -1; $("icerik").innerHTML = ozetHtml(j.ozet, progress.completed); ilerle();
+    }
+  } catch (e) {
+    if (requestId !== istekNo) return;
+    $("icerik").innerHTML = `<div class="card err"><b>${esc(e.message)}</b><br><button class="sm" onclick="mod_('${mod}')">Tekrar dene</button></div>`;
+  }
+}
+
+function ozetHtml(o, completed = []) {
+  const k = o.kartlar || [];
+  return `<div class="sum-head"><b>${esc(o.baslik)}</b><br><small>${k.length} kart · ~${esc(o.sure_dk || "")} dk · yaklaşık çalışma süresi · <span id="ilerlemeMetin"></span></small>
+    <div class="bar"><i id="bar"></i></div><div class="tabs"><button class="sm quiet-btn" onclick="kartGez(-1)">← Önceki</button><button class="sm quiet-btn" onclick="kartGez(1)">Sonraki →</button><button class="sm quiet-btn" onclick="tumKartlar()">Tümünü göster</button></div></div>` +
+    k.map((c, i) => `<div class="card kart ${esc(c.onem)} ${completed.includes(i) ? "done" : ""}">
+      <h3><span>${i + 1}. ${esc(c.baslik)}</span>${c.sayfa ? `<span class="chip">Sayfa ${esc(c.sayfa)}</span>` : ""}</h3>
+      <p>${esc(c.icerik)}</p>${c.ornek ? `<div class="ornek">💡 ${esc(c.ornek)}</div>` : ""}<button class="sm card-check" onclick="kartDurumu(this,${i})">${completed.includes(i) ? "✓ Okundu" : "Okudum"}</button></div>`).join("");
+}
+function ilerle() {
+  const t = document.querySelectorAll(".kart"), d = document.querySelectorAll(".kart.done");
+  if ($("bar") && t.length) $("bar").style.width = (d.length / t.length * 100) + "%";
+  if ($("ilerlemeMetin")) $("ilerlemeMetin").textContent = `${d.length} / ${t.length} kart tamamlandı`;
+}
+
+function quizHtml(q) {
+  return q.map((x, i) => `<div class="card q"><b>${i + 1}. ${esc(x.soru)}</b>` +
+    x.secenekler.map((s, k) => `<button class="opt" onclick="cevap(this,${i},${k})">${esc(s)}</button>`).join("") +
+    `<small id="a${i}"></small></div>`).join("") + `<div id="quizSonuc" class="card q-result" hidden></div>`;
+}
+function cevap(b, i, k) {
+  const q = window._quiz[i];
+  b.parentNode.querySelectorAll(".opt").forEach((x, n) => { x.disabled = true; if (n === q.dogru) x.classList.add("ok"); });
+  if (k !== q.dogru) b.classList.add("bad");
+  $("a" + i).textContent = q.aciklama || "";
+  quizCevaplar[i] = k;
+  if (Object.keys(quizCevaplar).length === window._quiz.length) {
+    const correct = window._quiz.filter((x,n) => quizCevaplar[n] === x.dogru).length;
+    const result = $("quizSonuc"); result.hidden = false;
+    result.innerHTML = `<h3>Quiz tamamlandı</h3><p>${correct} / ${window._quiz.length} doğru</p><button class="sm" onclick="mod_('quiz')">Tekrar çöz</button><button class="sm quiet-btn" onclick="yanlislariGoster()">Yanlışları incele</button>`;
+  }
+}
+
+function kartGez(adim){const cards=[...document.querySelectorAll('.kart')];if(!cards.length)return;if(kartGorunumu<0)kartGorunumu=adim>0?0:cards.length-1;else kartGorunumu=Math.max(0,Math.min(cards.length-1,kartGorunumu+adim));cards.forEach((x,i)=>x.hidden=i!==kartGorunumu)}
+function tumKartlar(){kartGorunumu=-1;document.querySelectorAll('.kart').forEach(x=>x.hidden=false)}
+
+async function kartDurumu(button,index) {
+  const element=button.closest('.kart'), target=!element.classList.contains('done'), nid=aktifNot, mode=aktifMod;
+  button.disabled=true;
+  try {const r=await fetch(`/api/progress/${nid}/${mode}/${index}`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({value:target})}); if(!r.ok)throw Error(); element.classList.toggle('done',target);button.textContent=target?'✓ Okundu':'Okudum';ilerle();}
+  catch(e){alert('İlerleme kaydedilemedi. Tekrar dene.')} finally {button.disabled=false}
+}
+async function odevDurumu(id,value){try {const r=await fetch(`/api/tasks/${id}`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({value})}); if(!r.ok)throw Error(); await yukle()}catch(e){alert('Ödev durumu kaydedilemedi.')}}
+function dersAc(i){
+  const d=feedData, course=d.program[i]; if(!course)return;
+  $('dersDialogTitle').textContent=course.ders;
+  const notes=d.duyurular.filter(x=>x.id && x.ders===course.ders), notices=d.duyurular.filter(x=>(x.arsiv_id || x.sabis_id) && x.ders===course.ders), tasks=d.odevler.filter(x=>x.ders===course.ders);
+  $('dersDialogBody').innerHTML=`<p>${esc(course.saat)} · ${esc(course.yer)}</p><h4>Ders notları</h4>${notes.length?notes.map(x=>`<div class="notify-row"><b>${esc(x.baslik)}</b><br><button class="sm" onclick="notAc('${x.id}','hazirlik')">Notu aç</button></div>`).join(''):'<small>Henüz ders notu yok.</small>'}<h4>Duyurular</h4>${notices.length?notices.map(x=>`<div class="notify-row">${esc(x.baslik)} <small>${esc(x.zaman)}</small></div>`).join(''):'<small>Duyuru yok.</small>'}<h4>Ödevler</h4>${tasks.length?tasks.map(x=>`<div class="notify-row">${esc(x.baslik)} · ${esc(x.son)} ${x.tamamlandi?'· tamamlandı':''}</div>`).join(''):'<small>Ödev yok.</small>'}`;
+  $('dersDialog').showModal();
+}
+function bildirimleriAc(){const notes=(feedData?.duyurular||[]).filter(x=>x.id);$('bildirimList').innerHTML=notes.map(x=>`<div class="notify-row"><span class="tag">${x.okundu?'OKUNDU':'YENİ'}</span><br><b>${esc(x.ders)}</b><br><small>${esc(x.baslik)} · ${esc(x.zaman)}</small><br><button class="sm" onclick="notAc('${x.id}','hazirlik')">Notu aç</button></div>`).join('')||'<p>Henüz bildirim yok.</p>';$('bildirimDialog').showModal()}
+async function tumunuOku(){try{const r=await fetch('/api/notes/read-all',{method:'POST'});if(!r.ok)throw Error();$('bildirimDialog').close();await yukle()}catch(e){alert('Bildirimler güncellenemedi.')}}
+function yanlislariGoster(){document.querySelectorAll('.q').forEach((el,i)=>{el.hidden=quizCevaplar[i]===window._quiz[i].dogru});document.getElementById('notBaslik').scrollIntoView({behavior:'smooth'})}
+
+</script>
+</body>
+</html>

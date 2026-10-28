@@ -1,0 +1,10 @@
+fastapi
+uvicorn
+python-multipart
+pymupdf
+google-genai
+python-dotenv
+
+tzdata
+google-api-python-client
+google-auth-oauthlib

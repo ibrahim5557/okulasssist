@@ -1,0 +1,150 @@
+{
+  "program": [
+    {
+      "ders": "Yazılım Mühendisliği Tasarımı",
+      "gun": 0,
+      "saat": "17:00–19:00",
+      "yer": "İnternet"
+    },
+    {
+      "ders": "Derin Öğrenme ve Uygulamaları",
+      "gun": 1,
+      "saat": "09:00–12:00",
+      "yer": "Derslik 1107"
+    },
+    {
+      "ders": "Sistem Programlama",
+      "gun": 1,
+      "saat": "14:00–17:00",
+      "yer": "Derslik 1209"
+    },
+    {
+      "ders": "Bilgisayar Ağları",
+      "gun": 2,
+      "saat": "09:00–12:00",
+      "yer": "Derslik 1106"
+    },
+    {
+      "ders": "Staj II",
+      "gun": 3,
+      "saat": "08:00–09:00",
+      "yer": "Ofis 1208-C"
+    },
+    {
+      "ders": "Kriptolojiye Giriş",
+      "gun": 3,
+      "saat": "13:00–16:00",
+      "yer": "Derslik 1107"
+    },
+    {
+      "ders": "Dijital Görüntü İşleme",
+      "gun": 4,
+      "saat": "09:00–12:00",
+      "yer": "Derslik 1207"
+    },
+    {
+      "ders": "Veri Analitiği",
+      "gun": 4,
+      "saat": "14:00–17:00",
+      "yer": "Derslik 1107"
+    }
+  ],
+  "odevler": [
+    {
+      "ders": "Sistem Programlama",
+      "baslik": "Yeni ödev",
+      "son": "27.11.2026"
+    },
+    {
+      "ders": "Kriptolojiye Giriş",
+      "baslik": "Yeni ödev",
+      "son": "20.12.2026"
+    },
+    {
+      "ders": "Kriptolojiye Giriş",
+      "baslik": "Yeni ödev",
+      "son": "20.12.2026"
+    },
+    {
+      "ders": "Veri Analitiği",
+      "baslik": "Yeni ödev",
+      "son": "11.12.2026"
+    },
+    {
+      "ders": "Yazılım Mühendisliği Tasarımı",
+      "baslik": "Yeni ödev",
+      "son": "10.01.2027"
+    },
+    {
+      "ders": "Yazılım Mühendisliği Tasarımı",
+      "baslik": "Yeni ödev",
+      "son": "31.12.2026"
+    },
+    {
+      "ders": "Yazılım Mühendisliği Tasarımı",
+      "baslik": "Yeni ödev",
+      "son": "30.11.2026"
+    },
+    {
+      "ders": "Yazılım Mühendisliği Tasarımı",
+      "baslik": "Yeni ödev",
+      "son": "31.10.2026"
+    }
+  ],
+  "duyurular": [
+    {
+      "kaynak": "SABİS · örnek kayıt",
+      "ders": "Dijital Görüntü İşleme",
+      "baslik": "Project details",
+      "zaman": "25 Ekim 13:13"
+    },
+    {
+      "kaynak": "SABİS · örnek kayıt",
+      "ders": "Staj II",
+      "baslik": "Internship interviews cancellation due to weather and rescheduling",
+      "zaman": "15 Ekim 16:43"
+    },
+    {
+      "kaynak": "SABİS · örnek kayıt",
+      "ders": "Yazılım Mühendisliği Tasarımı",
+      "baslik": "2209 proje başvuruları",
+      "zaman": "14 Ekim 16:38"
+    },
+    {
+      "kaynak": "SABİS · örnek kayıt",
+      "ders": "Yazılım Mühendisliği Tasarımı",
+      "baslik": "Tasarım çalışması raporlar ve iletişim",
+      "zaman": "14 Ekim 16:35"
+    },
+    {
+      "kaynak": "SABİS · örnek kayıt",
+      "ders": "Dijital Görüntü İşleme",
+      "baslik": "Project groups",
+      "zaman": "9 Ekim 22:30"
+    },
+    {
+      "kaynak": "SABİS · örnek kayıt",
+      "ders": "Staj II",
+      "baslik": "Cancellation of interview session",
+      "zaman": "7 Ekim 12:59"
+    },
+    {
+      "kaynak": "SABİS · örnek kayıt",
+      "ders": "Bilgisayar Ağları",
+      "baslik": "Ders İptali",
+      "zaman": "6 Ekim 15:53"
+    },
+    {
+      "kaynak": "SABİS · örnek kayıt",
+      "ders": "Staj II",
+      "baslik": "Internship Interview Sessions",
+      "zaman": "1 Ekim 16:05"
+    },
+    {
+      "kaynak": "SABİS · örnek kayıt",
+      "ders": "Dijital Görüntü İşleme",
+      "baslik": "Form and saval app",
+      "zaman": "30 Eylül 12:18"
+    }
+  ]
+}
